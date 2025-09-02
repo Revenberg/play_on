@@ -19,7 +19,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: playon
+      MYSQL_DATABASE: gameon
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     ports:
@@ -37,14 +37,14 @@ services:
       DB_HOST: mysql
       DB_USER: admin
       DB_PASSWORD: admin
-      DB_NAME: playon
+      DB_NAME: gameon
     volumes:
       - ./lora-reader:/app
     restart: always
 
   webserver:
     build: ./webserver
-    container_name: playon_web
+    container_name: gameon_web
     depends_on:
       - mysql
     ports:
@@ -53,7 +53,7 @@ services:
       DB_HOST: mysql
       DB_USER: admin
       DB_PASSWORD: admin
-      DB_NAME: playon
+      DB_NAME: gameon
     volumes:
       - ./webserver:/app
     restart: always

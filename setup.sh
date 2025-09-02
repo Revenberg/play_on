@@ -8,14 +8,14 @@ set -e
 #sudo usermod -aG docker $USER
 #sudo pip3 install docker-compose
 cd ~
-sudo rm -rf play_on 2>/dev/null 
+sudo rm -rf game_on 2>/dev/null 
 cd ~
-git clone --branch release https://github.com/revenberg/play_on.git
+git clone --branch release https://github.com/revenberg/game_on.git
 
-cd ~/play_on/docker
+cd ~/game_on/docker
 docker compose down
 
-cd ~/play_on
+cd ~/game_on
 cp update.sh ~/update.sh
 chmod +x ~/update.sh
 

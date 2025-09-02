@@ -9,14 +9,14 @@ def get_db_connection():
         host=os.environ.get('DB_HOST', 'localhost'),
         user=os.environ.get('DB_USER', 'mysqladmin'),
         password=os.environ.get('DB_PASSWORD', 'adminpassword'),
-        database=os.environ.get('DB_NAME', 'playon'),
+        database=os.environ.get('DB_NAME', 'gameon'),
         autocommit=True
     )
 
 @app.route('/')
 def index():
     return render_template_string("""
-    <h1>PlayOn Database Maintenance</h1>
+    <h1>GameOn Database Maintenance</h1>
     <ul>
       <li><a href='/users'>Users</a></li>
       <li><a href='/teams'>Teams</a></li>
