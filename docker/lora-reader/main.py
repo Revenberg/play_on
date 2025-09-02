@@ -80,10 +80,10 @@ def process_lora_message(msg, conn):
                     cur.execute("""
                     INSERT INTO messages (node_id, user_id, team_id, object, `function`, parameters, timestamp)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (node_id, user_id, team_id, obj, func, params, timestamp))
-            print("Message inserted into database.")
-    except Exception as e:
-        print(f"Failed to insert message: {e}")
+                    """, (node_id, user_id, team_id, obj, func, params, timestamp))
+                print("Message inserted into database.")
+            except Exception as e:
+                print(f"Failed to insert message: {e}")
 
 def main():
     print(f"main")
