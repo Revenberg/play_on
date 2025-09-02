@@ -1,14 +1,21 @@
 import pymysql
 import os
+import time
 
-def get_db_connection():
-    return pymysql.connect(
-        host=os.environ.get('DB_HOST', 'mysql'),
-        user=os.environ.get('DB_USER', 'admin'),
-        password=os.environ.get('DB_PASSWORD', 'admin'),
-        database=os.environ.get('DB_NAME', 'gameon'),
-        autocommit=True
-    )
+def get_db_connection(retries=10, delay=3):
+    for attempt in range(retries):
+        try:
+            return pymysql.connect(
+                host=os.environ.get('DB_HOST', 'mysql'),
+                user=os.environ.get('DB_USER', 'admin'),
+                password=os.environ.get('DB_PASSWORD', 'admin'),
+                database=os.environ.get('DB_NAME', 'gameon'),
+                autocommit=True
+            )
+        except pymysql.err.OperationalError as e:
+            print(f"MySQL connection failed (attempt {attempt+1}/{retries}): {e}")
+            time.sleep(delay)
+    raise Exception("Could not connect to MySQL after several attempts.")
 
 def create_tables(conn):
     with conn.cursor() as cur:
