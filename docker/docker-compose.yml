@@ -29,7 +29,9 @@ services:
     volumes:
       - ./lora-reader:/app
     restart: always
-
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      
   webserver:
     build: ./webserver
     container_name: gameon_web
