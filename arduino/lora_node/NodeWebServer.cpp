@@ -4,6 +4,7 @@
 #include <ESPAsyncWebServer.h>
 #include "User.h"
 #include "NodeWebServer.h"
+#include "version.h"
 #include "LoraNode.h"
 
 // ====== Config ======

@@ -1,4 +1,5 @@
 #include "LoraNode.h"
+#include "version.h"
 #include <map>
 #include <sstream>
 

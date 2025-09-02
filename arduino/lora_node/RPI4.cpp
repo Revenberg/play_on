@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "rpi4.h"
+#include "version.h"
 #include "LoraNode.h"
 
 void RPI4::setup() {
