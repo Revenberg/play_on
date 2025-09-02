@@ -26,12 +26,13 @@ services:
       DB_NAME: gameon
       USB_PORT: /dev/ttyUSB0
       USB_BAUDRATE: 115200
+      PYTHONUNBUFFERED: 1
     volumes:
       - ./lora-reader:/app
     restart: always
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
-      
+
   webserver:
     build: ./webserver
     container_name: gameon_web
