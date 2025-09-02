@@ -77,7 +77,7 @@ def process_lora_message(msg, conn):
 
 def main():
     print(f"main")
-    conn = get_db_conne ction()
+    conn = get_db_connection()
     print(f"connection established")
     create_tables(conn)
     print(f"Tables created")
