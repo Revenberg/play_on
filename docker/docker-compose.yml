@@ -24,6 +24,8 @@ services:
       DB_USER: admin
       DB_PASSWORD: admin
       DB_NAME: gameon
+      USB_PORT: /dev/ttyUSB0
+      USB_BAUDRATE: 115200
     volumes:
       - ./lora-reader:/app
     restart: always

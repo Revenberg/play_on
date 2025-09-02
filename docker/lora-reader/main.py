@@ -1,6 +1,7 @@
 import pymysql
 import os
 import time
+import serial
 
 def get_db_connection(retries=10, delay=3):
     for attempt in range(retries):
@@ -57,18 +58,37 @@ def create_tables(conn):
         """)
 
 def process_lora_message(msg, conn):
-    # TODO: Parse and split msg into tables
-    # Example stub: print(msg)
+    # Parse message: node_id;user_id;team_id;object;function;parameters;timestamp
     print(f"Received LoRa message: {msg}")
-    # Implement parsing and DB insertion logic here
+    parts = msg.split(';')
+    if len(parts) != 7:
+        print("Invalid message format")
+        return
+    node_id, user_id, team_id, obj, func, params, timestamp = parts
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                INSERT INTO messages (node_id, user_id, team_id, object, `function`, parameters, timestamp)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (node_id, user_id, team_id, obj, func, params, timestamp))
+        print("Message inserted into database.")
+    except Exception as e:
+        print(f"Failed to insert message: {e}")
 
 def main():
     conn = get_db_connection()
     create_tables(conn)
-    # TODO: Replace with actual LoRa message reading logic
-    # For now, simulate receiving a message
-    test_msg = "node1;user1;teamA;object;function;parameters;2025-09-01 12:00:00"
-    process_lora_message(test_msg, conn)
+    usb_port = os.environ.get('USB_PORT', '/dev/ttyUSB0')
+    baudrate = int(os.environ.get('USB_BAUDRATE', '115200'))
+    try:
+        with serial.Serial(usb_port, baudrate, timeout=1) as ser:
+            print(f"Listening for LoRa messages on {usb_port}...")
+            while True:
+                line = ser.readline().decode('utf-8').strip()
+                if line:
+                    process_lora_message(line, conn)
+    except Exception as e:
+        print(f"Failed to open USB port: {e}")
 
 if __name__ == "__main__":
     main()
