@@ -36,10 +36,10 @@ void LoraNode::setup()
     // Set node name based on MAC
     String mac = WiFi.softAPmacAddress();
     mac.replace(":", "");
-    nodeName = "LoRA_" + mac;
+    LoraNode::nodeName = "LoRA_" + mac;
 
     Serial.println("[LoRa] Init OK, node = " + nodeName);
-    addOnlineNode(nodeName, 0, 0);
+    LoraNode::sendBeacon();
 }
 
 // =======================
@@ -235,6 +235,7 @@ void LoraNode::handleMessage(NodeMessage nodeMessage)
 // =======================
 void LoraNode::handlePacket(const String &packet)
 {
+    Serial.printf("[LoRa RX] Packet received: %s\n", packet.c_str());
     if (packet.startsWith("BEACON;"))
     {
         String sender = packet.substring(7);
@@ -273,5 +274,8 @@ void LoraNode::sendBeacon()
     if (state == RADIOLIB_ERR_NONE)
     {
         Serial.println("[LoRa TX] " + packet);
+        float rssi = radio.getRSSI();
+        float snr = radio.getSNR();
+        addOnlineNode("self: " + nodeName, rssi, snr);
     }
 }

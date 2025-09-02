@@ -1,0 +1,61 @@
+services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: admin
+      PMA_PASSWORD: admin
+    ports:
+      - "8080:80"
+  
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: playon
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  lora-reader:
+    build: ./lora-reader
+    container_name: lora_reader
+    depends_on:
+      - mysql
+    environment:
+      DB_HOST: mysql
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_NAME: playon
+    volumes:
+      - ./lora-reader:/app
+    restart: always
+
+  webserver:
+    build: ./webserver
+    container_name: playon_web
+    depends_on:
+      - mysql
+    ports:
+      - "80:80"
+    environment:
+      DB_HOST: mysql
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_NAME: playon
+    volumes:
+      - ./webserver:/app
+    restart: always
+
+volumes:
+  mysql_data:
