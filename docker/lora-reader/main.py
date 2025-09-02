@@ -64,7 +64,7 @@ def process_lora_message(msg, conn):
     if msg.startswith("[LoRa RX]"):
         msg = msg[len("[LoRa RX]"):].strip()
         if msg.startswith('BEACON'):
-            msg = msg[len('BEACON'):].strip().strip('"')
+            msg = msg[len('BEACON'):].strip()
             parts = msg.split(';')
             node_id, rssi, snr, nodeversion = parts
             print(f"BEACON received: node_id={node_id}, rssi={rssi}, snr={snr}, nodeversion={nodeversion}")
