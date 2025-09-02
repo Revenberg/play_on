@@ -11,6 +11,7 @@ services:
       PMA_PASSWORD: admin
     ports:
       - "8080:8080"
+    platform: linux/arm64
   
   mysql:
     image: mysql:8.0
