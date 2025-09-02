@@ -86,7 +86,8 @@ def main():
             while True:
                 line = ser.readline().decode('utf-8').strip()
                 if line:
-                    process_lora_message(line, conn)
+                   print(f"Received LoRa message: {line}")
+                   process_lora_message(line, conn)
     except Exception as e:
         print(f"Failed to open USB port: {e}")
 
