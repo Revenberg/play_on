@@ -268,7 +268,7 @@ void LoraNode::handlePacket(const String &packet)
 // =======================
 void LoraNode::sendBeacon()
 {
-    String packet = "BEACON;" + nodeName;
+    String packet = "BEACON;" + nodeName + ";" + String(radio.getRSSI()) + ";" + String(radio.getSNR()) + ";" + RELEASE_ID;
     int state = radio.transmit(packet);
 
     if (state == RADIOLIB_ERR_NONE)

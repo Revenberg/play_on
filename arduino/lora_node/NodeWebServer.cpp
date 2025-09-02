@@ -111,7 +111,7 @@ String NodeWebServer::makePage(String session)
     String page(PAGE_INDEX);
     String username = User::getNameBySession(session);
     String team = User::getUserTeamBySession(session);
-    String title = "Game on Webserver";
+    String title = "Game on Webserver " + RELEASE_ID;
     // Links
     String links = "<div class='box'><h3>Webserver Links</h3><ul>";
     links += "<li><a href='/'>Home</a></li>";

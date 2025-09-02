@@ -13,6 +13,8 @@
 #define MAX_ONLINE_NODES 20
 #define NODE_TIMEOUT 60000    // 60s voor offline
 
+#define RELEASE_ID "v0.0.2"
+
 NodeButton button(0); // Vervang 0 door het juiste pinnummer
 
 void setup() {
