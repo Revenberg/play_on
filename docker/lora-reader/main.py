@@ -76,10 +76,14 @@ def process_lora_message(msg, conn):
         print(f"Failed to insert message: {e}")
 
 def main():
-    conn = get_db_connection()
+    print(f"main")
+    conn = get_db_conne ction()
+    print(f"connection established")
     create_tables(conn)
+    print(f"Tables created")
     usb_port = os.environ.get('USB_PORT', '/dev/ttyUSB0')
     baudrate = int(os.environ.get('USB_BAUDRATE', '115200'))
+    print(f"Using USB port: {usb_port} at baudrate: {baudrate}")
     try:
         with serial.Serial(usb_port, baudrate, timeout=1) as ser:
             print(f"Listening for LoRa messages on {usb_port}...")
