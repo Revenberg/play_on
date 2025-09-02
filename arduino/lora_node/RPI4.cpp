@@ -7,7 +7,7 @@ void RPI4::setup() {
     Serial.begin(115200);
     delay(200);
     Serial.println("[RPI4] Setup complete");
-    Serial.println("[RPI4] RELEASE_ID: " + RELEASE_ID);
+  Serial.println(String("[RPI4] RELEASE_ID: ") + RELEASE_ID);
 }
 
 void RPI4::loop() {
