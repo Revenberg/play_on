@@ -43,7 +43,7 @@ def create_tables(conn):
             user_id INT,
             team_id INT,
             object VARCHAR(64),
-            function VARCHAR(64),
+            `function` VARCHAR(64),
             parameters TEXT,
             timestamp DATETIME
         )

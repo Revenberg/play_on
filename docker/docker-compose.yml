@@ -1,17 +1,4 @@
 services:
-  phpmyadmin:
-    image: arm64v8/phpmyadmin
-    container_name: phpmyadmin
-    platform: linux/arm64
-    restart: always
-    depends_on:
-      - mysql
-    environment:
-      PMA_HOST: mysql
-      PMA_ARBITRARY: 1
-    ports:
-      - "8080:8080"
-  
   mysql:
     image: mysql:8.0
     container_name: mysql_db
