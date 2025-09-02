@@ -62,7 +62,10 @@ def process_lora_message(msg, conn):
     print(f"Received LoRa message: {msg}")
 
     if msg.startswith("[LoRa RX]"):
+        print(f"[LoRa RX]")
         msg = msg[len("[LoRa RX]"):].strip()
+        print(f"Received LoRa message: {msg}")
+
         if msg.startswith('BEACON'):
             msg = msg[len('BEACON'):].strip()
             parts = msg.split(';')
