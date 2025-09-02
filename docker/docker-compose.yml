@@ -10,7 +10,7 @@ services:
       PMA_USER: admin
       PMA_PASSWORD: admin
     ports:
-      - "8080:80"
+      - "8080:8080"
   
   mysql:
     image: mysql:8.0
@@ -47,7 +47,7 @@ services:
     depends_on:
       - mysql
     ports:
-      - "80:80"
+      - "8888:80"
     environment:
       DB_HOST: mysql
       DB_USER: admin
