@@ -9,7 +9,7 @@ set -e
 
 sudo rm -rf play_on 2>/dev/null 
 cd ~
-git clone https://github.com/revenberg/play_on.git
+git clone --branch release https://github.com/revenberg/play_on.git
 
 cd ~/play_on/docker
 docker compose down
