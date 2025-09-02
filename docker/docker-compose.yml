@@ -2,6 +2,7 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
+    platform: linux/arm64
     restart: always
     depends_on:
       - mysql
@@ -9,9 +10,9 @@ services:
       PMA_HOST: mysql
       PMA_USER: admin
       PMA_PASSWORD: admin
+      PMA_ARBITRARY: 1           # laat je handmatig DB-host kiezen
     ports:
       - "8080:8080"
-    platform: linux/arm64
   
   mysql:
     image: mysql:8.0
