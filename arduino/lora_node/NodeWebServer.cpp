@@ -218,7 +218,6 @@ void NodeWebServer::setupLogin()
                                   "<form method='POST' action='/login'>"
                                   "User:<input name='user'><br>"
                                   "Pass:<input type='password' name='pass'><br>"
-                                  "Team:<input name='team'><br>"
                                   "<input type='submit'></form>"); });
 
     httpServer.on("/login", HTTP_POST, [](AsyncWebServerRequest *request)
