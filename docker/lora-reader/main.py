@@ -60,18 +60,28 @@ def create_tables(conn):
 def process_lora_message(msg, conn):
     # Parse message: node_id;user_id;team_id;object;function;parameters;timestamp
     print(f"Received LoRa message: {msg}")
-    parts = msg.split(';')
-    if len(parts) != 7:
-        print("Invalid message format")
-        return
-    node_id, user_id, team_id, obj, func, params, timestamp = parts
-    try:
-        with conn.cursor() as cur:
-            cur.execute("""
-                INSERT INTO messages (node_id, user_id, team_id, object, `function`, parameters, timestamp)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (node_id, user_id, team_id, obj, func, params, timestamp))
-        print("Message inserted into database.")
+
+    if msg.startswith("[LoRa RX]"):
+        msg = msg[len("[LoRa RX]"):].strip()
+        if msg.startswith('BEACON'):
+            msg = msg[len('BEACON'):].strip().strip('"')
+            parts = msg.split(';')
+            node_id, rssi, snr, nodeversion = parts
+            print(f"BEACON received: node_id={node_id}, rssi={rssi}, snr={snr}, nodeversion={nodeversion}")
+            return
+
+        if msg.startswith('test'):
+#            msg = msg[len('test'):].strip().strip('"')
+
+            parts = msg.split(';')
+            node_id, user_id, team_id, obj, func, params, timestamp = parts
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("""
+                    INSERT INTO messages (node_id, user_id, team_id, object, `function`, parameters, timestamp)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (node_id, user_id, team_id, obj, func, params, timestamp))
+            print("Message inserted into database.")
     except Exception as e:
         print(f"Failed to insert message: {e}")
 
