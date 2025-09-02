@@ -3,9 +3,9 @@ import os
 
 def get_db_connection():
     return pymysql.connect(
-        host=os.environ.get('DB_HOST', 'localhost'),
-        user=os.environ.get('DB_USER', 'mysqladmin'),
-        password=os.environ.get('DB_PASSWORD', 'adminpassword'),
+        host=os.environ.get('DB_HOST', 'mysql'),
+        user=os.environ.get('DB_USER', 'admin'),
+        password=os.environ.get('DB_PASSWORD', 'admin'),
         database=os.environ.get('DB_NAME', 'gameon'),
         autocommit=True
     )
