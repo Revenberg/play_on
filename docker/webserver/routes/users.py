@@ -8,7 +8,7 @@ def users():
     conn = get_db_connection()
     msg = ""
     with conn.cursor() as cur:
-        cur.execute("SELECT id, teamname FROM teams")
+        cur.execute("SELECT id, teamname FROM teams ORDER BY teamname")
         teams = cur.fetchall()
     if request.method == 'POST':
         username = request.form.get('username')
