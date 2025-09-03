@@ -3,9 +3,11 @@ import pymysql
 import os
 import time
 import serial
+import threading
 
 rpibeaconid = None
-        
+last_user_update = None
+
 def get_db_connection(retries=10, delay=3):
     for attempt in range(retries):
         try:
@@ -130,6 +132,36 @@ def process_lora_message(msg, conn):
             except Exception as e:
                 print(f"Failed to insert message: {e}")
 
+def loraSend(nodeMessage):
+    # Send the LoRa message
+    print(f"Sending LoRa message: {nodeMessage}")
+    msgID = String(millis())
+    msg = "MSG;" + msgID + ";RPI;" + 3 + ";" + nodeMessage
+
+
+
+def check_user_updates(ser, conn):
+    while True:
+        if (last_user_update is None):
+            last_user_update = 0
+
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM users WHERE last_update > %s", (last_user_update,))
+            rows = cur.fetchall()
+            for row in rows:
+                print(f"User update found: {row}")
+                last_user_update = row['last_update']
+
+                username = row['Username']
+                pwdHash = row['password_hash']
+                token = row['token']
+                team = row['team']
+
+                loraSend("USER;ADD; name:" + username + ",pwdHash:" + pwdHash + ",token:" + token + ",team:" + team);
+
+
+        time.sleep(60)  # Wait 60 seconds
+
 def main():
     print(f"main")
     conn = get_db_connection()
@@ -139,19 +171,27 @@ def main():
     usb_port = os.environ.get('USB_PORT', '/dev/ttyUSB0')
     baudrate = int(os.environ.get('USB_BAUDRATE', '115200'))
     print(f"Using USB port: {usb_port} at baudrate: {baudrate}")
-    try:
-        with serial.Serial(usb_port, baudrate, timeout=1) as ser:
+    connection = False
+    ser = None
+    while not connection:
+        try:
+            ser = serial.Serial(usb_port, baudrate, timeout=1)
             print(f"Listening for LoRa messages on {usb_port}...")
-            while True:
-                line = ser.readline().decode('utf-8').strip()
-                if line:
-                   print(f"Received LoRa message: {line}")
-                   try:
-                       process_lora_message(line, conn)
-                   except Exception as e:
-                       print(f"Error processing LoRa message: {e}")
-    except Exception as e:
-       print(f"Failed to open USB port: {e}")
+            connection = True
+        except Exception as e:
+            print(f"Failed to open USB port: {e}")
+
+    # Start the background thread for checking user updates
+    threading.Thread(target=check_user_updates, args=(ser, conn), daemon=True).start()
+
+    while True:
+        line = ser.readline().decode('utf-8').strip()
+        if line:
+            print(f"Received LoRa message: {line}")
+            try:
+                process_lora_message(line, conn)
+            except Exception as e:
+                print(f"Error processing LoRa message: {e}")
 
 if __name__ == "__main__":
     main()
