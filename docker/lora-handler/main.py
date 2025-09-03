@@ -143,7 +143,7 @@ def check_user_updates(ser, conn):
                 username = row[0]
                 pwdHash = row[1]
                 token = row[2]
-                team = row[3]
+                teamname = row[3]
                 if (last_user_update is None) or (row[4] > last_user_update):
                     last_user_update = row[4]
 
