@@ -12,10 +12,10 @@ def users():
         teams = cur.fetchall()
     if request.method == 'POST':
         username = request.form.get('username')
-        team_id = request.form.get('team_id')
+        teamname = request.form.get('teamname')
         token = generate_token()
         password_hash = sha256(request.form.get('password'))
-        if username and team_id and token and password_hash:
+        if username and teamname and token and password_hash:
             try:
                 with conn.cursor() as cur:
                     cur.execute("SELECT COUNT(*) FROM users WHERE username = %s", (username,))
@@ -46,7 +46,7 @@ def users():
     </form>
     <p style="color:green;">{{msg}}</p>
     <table border=1>
-        <tr><th>ID</th><th>Username</th><th>Team ID</th><th>Token</th><th>Password Hash</th><th>Last Update</th></tr>
+        <tr><th>ID</th><th>Username</th><th>Teamname</th><th>Token</th><th>Password Hash</th><th>Last Update</th></tr>
         {% for row in rows %}
         <tr><td>{{row[0]}}</td><td>{{row[1]}}</td><td>{{row[2]}}</td><td>{{row[3]}}</td><td>{{row[4]}}</td><td>{{row[5]}}</td></tr>
         {% endfor %}
