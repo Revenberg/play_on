@@ -126,7 +126,8 @@ def process_lora_message(msg, conn):
 def loraSend(ser, nodeMessage):
     # Send the LoRa message
     print(f"Sending LoRa message: {nodeMessage}")
-    msgID = millis()
+    # Use Python's time.time() for millis equivalent
+    msgID = int(time.time() * 1000)
     msg = "MSG;" + String(msgID) + ";RPI;" + 3 + ";" + nodeMessage
     ser.write((msg + "\n").encode('utf-8'))
 
