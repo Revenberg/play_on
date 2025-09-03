@@ -133,7 +133,8 @@ def loraSend(ser, nodeMessage):
     ser.write((msg + "\n").encode('utf-8'))
 
 def check_user_updates(ser, conn):
-    last_user_update = 0
+    import datetime
+    last_user_update = datetime.datetime(2025, 1, 1)
     while True:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM users WHERE last_update > %s", (last_user_update,))
