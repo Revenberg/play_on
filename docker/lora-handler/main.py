@@ -29,7 +29,7 @@ def create_tables(conn):
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(64) UNIQUE,
-            team_id INT,
+            teamname VARCHAR(64),
             token VARCHAR(128),
             password_hash VARCHAR(225),
             last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -38,7 +38,7 @@ def create_tables(conn):
         cur.execute("""
         CREATE TABLE IF NOT EXISTS teams (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(64) UNIQUE
+            teamname VARCHAR(64) UNIQUE
         )
         """)
         cur.execute("""
@@ -55,8 +55,8 @@ def create_tables(conn):
         CREATE TABLE IF NOT EXISTS messages (
             id INT AUTO_INCREMENT PRIMARY KEY,
             node_id VARCHAR(64),
-            user_id INT,
-            team_id INT,
+            username VARCHAR(64),
+            team VARCHAR(64),
             object VARCHAR(64),
             `function` VARCHAR(64),
             parameters TEXT,
@@ -74,7 +74,6 @@ def parse_fields(msg):
 
 def process_lora_message(msg, conn):
     global rpibeaconid
-    # Parse message: node_id;user_id;team_id;object;function;parameters;timestamp
     print(f"Received LoRa message: {msg}")
 
     if msg.startswith("[LoRa RX]") or msg.startswith("[LoRa TX]"):
@@ -137,7 +136,7 @@ def check_user_updates(ser, conn):
     last_user_update = datetime.datetime(2025, 1, 1)
     while True:
         with conn.cursor() as cur:
-            cur.execute("SELECT username, password_hash, token, team, last_update FROM users WHERE last_update > %s", (last_user_update,))
+            cur.execute("SELECT username, password_hash, token, teamname, last_update FROM users WHERE last_update > %s", (last_user_update,))
             rows = cur.fetchall()
             for row in rows:
                 print(f"User update found: {row}")
@@ -149,7 +148,7 @@ def check_user_updates(ser, conn):
                 if (last_user_update is None) or (row[4] > last_user_update):
                     last_user_update = row[4]
 
-                loraSend(ser, "USER;ADD; name:" + username + ",pwdHash:" + pwdHash + ",token:" + token + ",team:" + team)
+                loraSend(ser, "USER;ADD; name:" + username + ",pwdHash:" + pwdHash + ",token:" + token + ",team:" + teamname)
                 time.sleep(5)  # Wait 10 seconds
 
         time.sleep(60)  # Wait 60 seconds
