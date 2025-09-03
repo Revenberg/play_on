@@ -87,7 +87,7 @@ def process_lora_message(msg, conn):
     if msg.startswith("[LoRa RX]"):
         print(f"[LoRa RX]")
         msg = msg[len("[LoRa RX]"):].strip()
-        print(f"Received LoRa message: {msg}")
+        print(f"Received LoRa message::::::::::: {msg}")
 
         if msg.startswith('BEACON'):
             print(f"[LoRa TX] BEACON")
