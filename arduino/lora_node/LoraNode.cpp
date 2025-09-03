@@ -247,7 +247,7 @@ void LoraNode::handlePacket(const String &packet)
         float rssi = radio.getRSSI();
         float snr = radio.getSNR();
 
-        String packet = "BEACON;nodeid: " + nodeid + ", rssi: " + String(rssi) + ", snr: " + String(snr) + ", version:" + RELEASE_ID;
+        String packet = "BEACON;nodeid: " + nodeid + ", rssi: " + String(rssi) + ", snr: " + String(snr) + ", version: " + RELEASE_ID;
         Serial.println("[LoRa RX] " + packet);
 
         addOnlineNode(nodeid, rssi, snr);
@@ -277,7 +277,7 @@ void LoraNode::sendBeacon()
 {
     float rssi = radio.getRSSI();
     float snr = radio.getSNR();
-    String packet = "BEACON;nodeid: " + nodeName + ", rssi: " + String(rssi) + ", snr: " + String(snr) + ", version:" + RELEASE_ID;
+    String packet = "BEACON;nodeid: " + nodeName + ", rssi: " + String(rssi) + ", snr: " + String(snr) + ", version: " + RELEASE_ID;
     int state = radio.transmit(packet);
 
     if (state == RADIOLIB_ERR_NONE)
