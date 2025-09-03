@@ -2,10 +2,13 @@
 #include "version.h"
 #include <map>
 #include <sstream>
+#include <SPI.h>
+#include <RadioLib.h>
 
 // =======================
 // Static vars
 // =======================
+
 Module LoraNode::loraModule(LORA_CS, LORA_DIO1, LORA_RST, LORA_BUSY);
 SX1262 LoraNode::radio(&loraModule);
 
@@ -19,58 +22,10 @@ String LoraNode::nodeName = "";
 unsigned long LoraNode::lastBeacon = 0;
 int LoraNode::beaconInterval = 30000; // 30s
 
-// =======================
-// Setup
-// =======================
-void LoraNode::setup()
-{
-    Serial.println("[LoRa] Initializing SX1262...");
-    int state = radio.begin(868.0, 125.0, 9, 7, 0x12);
-
-    if (state != RADIOLIB_ERR_NONE)
-    {
-        Serial.printf("[LoRa] init failed, code: %d\n", state);
-        while (true)
-            ;
-    }
-
-    // Set node name based on MAC
-    String mac = WiFi.softAPmacAddress();
-    mac.replace(":", "");
-    LoraNode::nodeName = "LoRA_" + mac;
-
-    Serial.println("[LoRa] Init OK, node = " + nodeName);
-    LoraNode::sendBeacon();
-}
-
-// =======================
-// Main loop
-// =======================
-void LoraNode::loop()
-{
-    // Check for incoming
-    String str;
-    int state = radio.receive(str);
-
-    if (state == RADIOLIB_ERR_NONE && str.length() > 0)
-    {
-        Serial.println("[LoRa RX] " + str);
-        handlePacket(str);
-    }
-
-    // Send beacon
-    if (millis() - lastBeacon > beaconInterval)
-    {
-        sendBeacon();
-        lastBeacon = millis();
-    }
-
-    // Cleanup offline
-    cleanOfflineNodes();
-}
 
 int LoraNode::getMsgCount() { return msgWriteIndex; }
 int LoraNode::getMsgWriteIndex() { return msgWriteIndex; }
+
 NodeMessage LoraNode::getMessage(int index) { return messages[index]; }
 String LoraNode::getMessageRow(int index)
 {
@@ -275,8 +230,8 @@ void LoraNode::handlePacket(const String &packet)
 // =======================
 void LoraNode::sendBeacon()
 {
-    float rssi = radio.getRSSI();
-    float snr = radio.getSNR();
+    float rssi = 0;
+    float snr = 0;
     String packet = "BEACON;nodeid: " + nodeName + ", rssi: " + String(rssi) + ", snr: " + String(snr) + ", version: " + RELEASE_ID;
     int state = radio.transmit(packet);
 
@@ -285,4 +240,64 @@ void LoraNode::sendBeacon()
         Serial.println("[LoRa TX]" + packet);
         addOnlineNode(nodeName, rssi, snr);
     }
+}
+
+// =======================
+// Setup
+// =======================
+void LoraNode::setup()
+{
+    Serial.println("[LoRa] Initializing SX1262...");
+    SPI.begin(9, 11, 10, 8);
+
+    pinMode(LORA_BUSY, INPUT);
+    Serial.print("BUSY pin state: ");
+    Serial.println(digitalRead(LORA_BUSY));
+
+    int state = radio.begin(868.0, 125.0, 9, 7, 0x34, 22, 8, 0);
+
+    if (state != RADIOLIB_ERR_NONE)
+    {
+        Serial.printf("[LoRa] init failed, code: %d\n", state);
+        while (true)
+            ;
+    }
+
+    // Set node name based on MAC
+    uint64_t chipid = ESP.getEfuseMac();
+    LoraNode::nodeName = "LoRA_" + String(chipid, HEX);
+
+    Serial.println("[LoRa] Init OK, node = " + nodeName);
+    LoraNode::sendBeacon();
+}
+
+// =======================
+// Main loop
+// =======================
+void LoraNode::loop()
+{
+    // Check for incoming
+    String str;
+    int state = radio.receive(str, 100);
+
+    // Debug: print receive state always
+    if (state == RADIOLIB_ERR_RX_TIMEOUT) {
+        // Timeout, no packet received, do nothing
+    } else if (state == RADIOLIB_ERR_NONE && str.length() > 0) {
+        Serial.println("[LoRa RX] " + str);
+        handlePacket(str);
+    } else {
+        Serial.print("[LoRa RX] Unexpected error code: ");
+        Serial.println(state);
+    }
+
+    // Send beacon
+    if (millis() - lastBeacon > beaconInterval)
+    {
+        sendBeacon();
+        lastBeacon = millis();
+    }
+
+    // Cleanup offline
+    cleanOfflineNodes();
 }

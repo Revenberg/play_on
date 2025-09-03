@@ -32,9 +32,6 @@ void User::loadUsersNVS()
         User::users[i].token = User::prefs.getString(("user" + String(i) + "_token").c_str(), "");
         User::users[i].passwordHash = User::prefs.getString(("user" + String(i) + "_hash").c_str(), "");
         User::users[i].team = User::prefs.getString(("user" + String(i) + "_team").c_str(), "");
-
-        Serial.printf("[User] Loaded user: %s\n", User::users[i].username.c_str());
-        Serial.printf("[User] Loaded token: %s\n", User::users[i].token.c_str());
     }
     User::prefs.end();
 }
