@@ -86,7 +86,7 @@ def process_lora_message(msg, conn):
 
         if msg.startswith('BEACON'):
             print(f"BEACON")
-            msg = msg[len('BEACON'):].strip()
+            msg = msg[len('BEACON;'):].strip()
 
             print(f"BEACON received: {msg}")
 
