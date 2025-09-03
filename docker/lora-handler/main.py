@@ -137,16 +137,16 @@ def check_user_updates(ser, conn):
     last_user_update = datetime.datetime(2025, 1, 1)
     while True:
         with conn.cursor() as cur:
-            cur.execute("SELECT username, password, token, team, last_update FROM users WHERE last_update > %s", (last_user_update,))
+            cur.execute("SELECT username, password_hash, token, team, last_update FROM users WHERE last_update > %s", (last_user_update,))
             rows = cur.fetchall()
             for row in rows:
                 print(f"User update found: {row}")
-                
-                username = row[1]
-                pwdHash = row[2]
-                token = row[3]
-                team = row[4]
-                last_user_update = row[5]
+
+                username = row[0]
+                pwdHash = row[1]
+                token = row[2]
+                team = row[3]
+                last_user_update = row[4]
 
                 loraSend(ser, "USER;ADD; name:" + username + ",pwdHash:" + pwdHash + ",token:" + token + ",team:" + team)
                 time.sleep(5)  # Wait 10 seconds
