@@ -8,7 +8,7 @@ def users():
     conn = get_db_connection()
     msg = ""
     with conn.cursor() as cur:
-        cur.execute("SELECT id, name FROM teams")
+        cur.execute("SELECT id, teamname FROM teams")
         teams = cur.fetchall()
     if request.method == 'POST':
         username = request.form.get('username')
@@ -23,8 +23,8 @@ def users():
                     if exists:
                         msg = f"Error: Username '{username}' already exists."
                     else:
-                        cur.execute("INSERT INTO users (username, team_id, token, password_hash) VALUES (%s, %s, %s, %s)",
-                                    (username, team_id, token, password_hash))
+                        cur.execute("INSERT INTO users (username, teamname, token, password_hash) VALUES (%s, %s, %s, %s)",
+                                    (username, teamname, token, password_hash))
                         msg = f"User '{username}' added successfully."
             except Exception as e:
                 msg = f"Error adding user: {e}"

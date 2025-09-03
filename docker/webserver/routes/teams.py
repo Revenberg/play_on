@@ -12,12 +12,12 @@ def teams():
         if team_name:
             try:
                 with conn.cursor() as cur:
-                    cur.execute("SELECT COUNT(*) FROM teams WHERE name = %s", (team_name,))
+                    cur.execute("SELECT COUNT(*) FROM teams WHERE teamname = %s", (team_name,))
                     exists = cur.fetchone()[0]
                     if exists:
                         msg = f"Error: Team name '{team_name}' already exists."
                     else:
-                        cur.execute("INSERT INTO teams (name) VALUES (%s)", (team_name,))
+                        cur.execute("INSERT INTO teams (teamname) VALUES (%s)", (team_name,))
                         msg = f"Team '{team_name}' added successfully."
             except Exception as e:
                 msg = f"Error adding team: {e}"
