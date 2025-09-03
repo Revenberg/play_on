@@ -13,10 +13,10 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
-  
-  lora-reader:
-    build: ./lora-reader
-    container_name: lora_reader
+
+  lora-handler:
+    build: ./lora-handler
+    container_name: lora_handler
     depends_on:
       - mysql
     environment:
@@ -28,7 +28,7 @@ services:
       USB_BAUDRATE: 115200
       PYTHONUNBUFFERED: 1
     volumes:
-      - ./lora-reader:/app
+      - ./lora-handler:/app
     restart: always
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
