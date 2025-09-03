@@ -88,7 +88,11 @@ def process_lora_message(msg, conn):
             print(f"BEACON")
             msg = msg[len('BEACON'):].strip()
 
+            print(f"BEACON received: {msg}")
+
             fields = parse_fields(msg)
+            print(f"fields = {fields}")
+
             node_id = fields['nodeid']
             rssi = fields['rssi']
             snr = fields['snr']
@@ -141,9 +145,12 @@ def main():
                 line = ser.readline().decode('utf-8').strip()
                 if line:
                    print(f"Received LoRa message: {line}")
-                   process_lora_message(line, conn)
+                   try:
+                       process_lora_message(line, conn)
+                   except Exception as e:
+                       print(f"Error processing LoRa message: {e}")
     except Exception as e:
-        print(f"Failed to open USB port: {e}")
+       print(f"Failed to open USB port: {e}")
 
 if __name__ == "__main__":
     main()
