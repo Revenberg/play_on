@@ -76,9 +76,9 @@ def process_lora_message(msg, conn):
 
     if msg.startswith("[LoRa RX]") or msg.startswith("[LoRa TX]"):
         if (msg.startswith("[LoRa RX]")) :
-            msg = msg[len("[LoRa RX]")].strip()
+            msg = msg[len("[LoRa RX]"):].strip()
         else:
-            msg = msg[len("[LoRa TX]")].strip()
+            msg = msg[len("[LoRa TX]"):].strip()
             if (rpibeaconid is None):
                 rpibeaconid = "rpi"           
         
