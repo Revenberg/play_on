@@ -4,7 +4,7 @@ import os
 import time
 import serial
 
-rpibeaconid = ""
+rpibeaconid = None
         
 def get_db_connection(retries=10, delay=3):
     for attempt in range(retries):
@@ -78,7 +78,7 @@ def process_lora_message(msg, conn):
             msg = msg[len("[LoRa RX]")].strip()
         else:
             msg = msg[len("[LoRa TX]")].strip()
-            if (rpibeaconid == ""):
+            if (rpibeaconid is None):
                 rpibeaconid = "rpi"           
         
         print(f"Received LoRa message: {msg}")
