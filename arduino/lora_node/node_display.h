@@ -20,7 +20,8 @@ int getBatteryPercent();
 void frame1(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y);
 void frame2(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y);
 void frame3(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y);
-extern FrameCallback frames[3];
+void frame4(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y);
+extern FrameCallback frames[4];
 
 // Overlay callback
 void overlay(OLEDDisplay *display, OLEDDisplayUiState* state);
