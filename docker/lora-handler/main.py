@@ -128,7 +128,7 @@ def loraSend(ser, nodeMessage):
     print(f"Sending LoRa message: {nodeMessage}")
     # Use Python's time.time() for millis equivalent
     msgID = int(time.time() * 1000)
-    msg = "MSG;" + String(msgID) + ";RPI;" + 3 + ";" + nodeMessage
+    msg = "MSG;" + str(msgID) + ";RPI;" + str(3) + ";" + nodeMessage
     ser.write((msg + "\n").encode('utf-8'))
 
 def check_user_updates(ser, conn):
