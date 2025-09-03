@@ -85,11 +85,8 @@ def process_lora_message(msg, conn):
         if msg.startswith("[LoRa TX]"):
             msg = msg[len("[LoRa TX]"):].strip()
 
-        print(f"LORA: {msg}")
-
         if msg.startswith('BEACON'):
             msg = msg[len('BEACON;'):].strip()
-            print(f"BEACON: {msg}")
             fields = parse_fields(msg)
             
             node_id = fields['nodeid']
