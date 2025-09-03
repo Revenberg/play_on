@@ -25,31 +25,77 @@ def index():
     </ul>
     """)
 
-@app.route('/users')
+@app.route('/users', methods=['GET', 'POST'])
 def users():
-    conn = get_db_connection()
-    with conn.cursor() as cur:
-        cur.execute("SELECT * FROM users")
-        rows = cur.fetchall()
-    return render_template_string("""
-    <h2>Users</h2>
-    <table border=1>
-      <tr><th>ID</th><th>Username</th><th>Team ID</th><th>Token</th><th>Password Hash</th></tr>
-      {% for row in rows %}
-      <tr><td>{{row[0]}}</td><td>{{row[1]}}</td><td>{{row[2]}}</td><td>{{row[3]}}</td><td>{{row[4]}}</td></tr>
-      {% endfor %}
-    </table>
-    <a href='/'>Back</a>
-    """, rows=rows)
+        conn = get_db_connection()
+        msg = ""
+        # Get available teams for dropdown
+        with conn.cursor() as cur:
+                cur.execute("SELECT id, name FROM teams")
+                teams = cur.fetchall()
+        if request.method == 'POST':
+                username = request.form.get('username')
+                team_id = request.form.get('team_id')
+                token = request.form.get('token')
+                password_hash = request.form.get('password_hash')
+                if username and team_id and token and password_hash:
+                        try:
+                                with conn.cursor() as cur:
+                                        cur.execute("INSERT INTO users (username, team_id, token, password_hash) VALUES (%s, %s, %s, %s)",
+                                                                (username, team_id, token, password_hash))
+                                msg = f"User '{username}' added successfully."
+                        except Exception as e:
+                                msg = f"Error adding user: {e}"
+        with conn.cursor() as cur:
+                cur.execute("SELECT * FROM users")
+                rows = cur.fetchall()
+        return render_template_string("""
+        <h2>Users</h2>
+        <form method="post">
+            <input type="text" name="username" placeholder="Username" required>
+            <select name="team_id" required>
+                <option value="">Select Team</option>
+                {% for team in teams %}
+                <option value="{{team[0]}}">{{team[1]}}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="token" placeholder="Token" required>
+            <input type="text" name="password_hash" placeholder="Password Hash" required>
+            <input type="submit" value="Add User">
+        </form>
+        <p style="color:green;">{{msg}}</p>
+        <table border=1>
+            <tr><th>ID</th><th>Username</th><th>Team ID</th><th>Token</th><th>Password Hash</th></tr>
+            {% for row in rows %}
+            <tr><td>{{row[0]}}</td><td>{{row[1]}}</td><td>{{row[2]}}</td><td>{{row[3]}}</td><td>{{row[4]}}</td></tr>
+            {% endfor %}
+        </table>
+        <a href='/'>Back</a>
+        """, rows=rows, teams=teams, msg=msg)
 
-@app.route('/teams')
+@app.route('/teams', methods=['GET', 'POST'])
 def teams():
     conn = get_db_connection()
+    msg = ""
+    if request.method == 'POST':
+        team_name = request.form.get('team_name')
+        if team_name:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("INSERT INTO teams (name) VALUES (%s)", (team_name,))
+                msg = f"Team '{team_name}' added successfully."
+            except Exception as e:
+                msg = f"Error adding team: {e}"
     with conn.cursor() as cur:
         cur.execute("SELECT * FROM teams")
         rows = cur.fetchall()
     return render_template_string("""
     <h2>Teams</h2>
+    <form method="post">
+      <input type="text" name="team_name" placeholder="New team name" required>
+      <input type="submit" value="Add Team">
+    </form>
+    <p style="color:green;">{{msg}}</p>
     <table border=1>
       <tr><th>ID</th><th>Name</th></tr>
       {% for row in rows %}
@@ -57,7 +103,7 @@ def teams():
       {% endfor %}
     </table>
     <a href='/'>Back</a>
-    """, rows=rows)
+    """, rows=rows, msg=msg)
 
 @app.route('/lora_nodes')
 def lora_nodes():
