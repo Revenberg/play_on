@@ -15,6 +15,8 @@ def users():
         teamname = request.form.get('teamname')
         token = generate_token()
         password_hash = sha256(request.form.get('password'))
+        print(f"user: {username}, team: {teamname}, token: {token}, pwdHash: {password_hash}")
+
         if username and teamname and token and password_hash:
             try:
                 with conn.cursor() as cur:
@@ -35,10 +37,10 @@ def users():
     <h2>Users</h2>
     <form method="post">
         <input type="text" name="username" placeholder="Username" required>
-        <select name="team_id" required>
+        <select name="teamname" required>
             <option value="">Select Team</option>
             {% for team in teams %}
-            <option value="{{team[0]}}">{{team[1]}}</option>
+            <option value="{{team[1]}}">{{team[1]}}</option>
             {% endfor %}
         </select>
         <input type="text" name="password" placeholder="Password" required>
