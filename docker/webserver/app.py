@@ -79,9 +79,9 @@ def users():
         </form>
         <p style="color:green;">{{msg}}</p>
         <table border=1>
-            <tr><th>ID</th><th>Username</th><th>Team ID</th><th>Token</th><th>Password Hash</th></tr>
+            <tr><th>ID</th><th>Username</th><th>Team ID</th><th>Token</th><th>Password Hash</th><th>Last Update</th></tr>
             {% for row in rows %}
-            <tr><td>{{row[0]}}</td><td>{{row[1]}}</td><td>{{row[2]}}</td><td>{{row[3]}}</td><td>{{row[4]}}</td></tr>
+            <tr><td>{{row[0]}}</td><td>{{row[1]}}</td><td>{{row[2]}}</td><td>{{row[3]}}</td><td>{{row[4]}}</td><td>{{row[5]}}</td></tr>
             {% endfor %}
         </table>
         <a href='/'>Back</a>
