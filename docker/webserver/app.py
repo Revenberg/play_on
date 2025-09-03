@@ -1,6 +1,7 @@
 from flask import Flask, render_template_string, request, redirect, url_for
 import pymysql
 import os
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 
@@ -12,6 +13,19 @@ def get_db_connection():
         database=os.environ.get('DB_NAME', 'gameon'),
         autocommit=True
     )
+
+import secrets
+
+def generate_token(length=32):
+    """
+    Generates a secure random token for user authentication.
+    :param length: Length of the token string.
+    :return: Hexadecimal token string.
+    """
+    return secrets.token_hex(length // 2)
+
+def hashPassword(password):
+    return generate_password_hash(password)
 
 @app.route('/')
 def index():
@@ -36,8 +50,9 @@ def users():
         if request.method == 'POST':
                 username = request.form.get('username')
                 team_id = request.form.get('team_id')
-                token = request.form.get('token')
-                password_hash = request.form.get('password_hash')
+                token = generate_token()
+                password_hash = hashPassword(request.form.get('password'))
+
                 if username and team_id and token and password_hash:
                         try:
                                 with conn.cursor() as cur:
@@ -59,8 +74,7 @@ def users():
                 <option value="{{team[0]}}">{{team[1]}}</option>
                 {% endfor %}
             </select>
-            <input type="text" name="token" placeholder="Token" required>
-            <input type="text" name="password_hash" placeholder="Password Hash" required>
+            <input type="text" name="password" placeholder="Password" required>
             <input type="submit" value="Add User">
         </form>
         <p style="color:green;">{{msg}}</p>
