@@ -1,8 +1,11 @@
+from attr import fields
 import pymysql
 import os
 import time
 import serial
 
+rpibeaconid = ""
+        
 def get_db_connection(retries=10, delay=3):
     for attempt in range(retries):
         try:
@@ -58,57 +61,54 @@ def create_tables(conn):
         )
         """)
 
+def parse_fields(msg):
+    fields = {}
+    for part in msg.split(','):
+        if ':' in part:
+            key, value = part.split(':', 1)
+            fields[key.strip()] = value.strip()
+    return fields
+
 def process_lora_message(msg, conn):
     # Parse message: node_id;user_id;team_id;object;function;parameters;timestamp
     print(f"Received LoRa message: {msg}")
 
-    if msg.startswith("[LoRa TX]"):
-        print(f"[LoRa TX]")
-        msg = msg[len("[LoRa TX]"):].strip()
+    if msg.startswith("[LoRa RX]") or msg.startswith("[LoRa TX]"):
+        if (msg.startswith("[LoRa RX]")) {
+            msg = msg[len("[LoRa RX]"):].strip();
+        } else {
+            msg = msg[len("[LoRa TX]"):].strip();
+            if (rpibeaconid == "") {
+                rpibeaconid = "rpi"
+            }
+        }
+
         print(f"Received LoRa message: {msg}")
 
         if msg.startswith('BEACON'):
-            print(f"[LoRa TX] BEACON")
+            print(f"BEACON")
             msg = msg[len('BEACON'):].strip()
-            parts = msg.split(';')
-            if len(parts) == 2:      
-                node_id, nodeversion = parts
-                print(f"BEACON received: node_id={node_id}, nodeversion={nodeversion}")
-                rssi, snr, rssi = 0, 0, 0  # Placeholder values
+
+            fields = parse_fields(msg)
+            node_id = fields['nodeid']
+            rssi = fields['rssi']
+            snr = fields['snr']
+            nodeversion = fields['version']
+
+            print(f"BEACON received: node_id={node_id}, rssi={rssi}, snr={snr}, nodeversion={nodeversion}")
+
+            if (rpibeaconid == "rpi"):
+                rpibeaconid = node_id
+            try:
                 with conn.cursor() as cur:
                     cur.execute("""
                     INSERT INTO lora_nodes (node_id, last_seen, rssi, snr, version)
                     VALUES (%s, NOW(), %s, %s, %s)
                     ON DUPLICATE KEY UPDATE last_seen=NOW(), rssi=%s, snr=%s, version=%s
-                        """, (node_id, rssi, snr, nodeversion, rssi, snr, nodeversion))
-                    print("LoRa node info updated in database.")
-            return
-
-    if msg.startswith("[LoRa RX]"):
-        print(f"[LoRa RX]")
-        msg = msg[len("[LoRa RX]"):].strip()
-        print(f"Received LoRa message::::::::::: {msg}")
-
-        if msg.startswith('BEACON'):
-            print(f"[LoRa TX] BEACON")
-            msg = msg[len('BEACON'):].strip()
-            parts = msg.split(';')
-
-            print(f"BEACON parts: {parts}")
-            print(f"Parts length: {len(parts)}")
-            if len(parts) == 4:      
-                node_id, rssi, snr, nodeversion = parts
-                print(f"BEACON received: node_id={node_id}, rssi={rssi}, snr={snr}, nodeversion={nodeversion}")
-                try:
-                    with conn.cursor() as cur:
-                        cur.execute("""
-                        INSERT INTO lora_nodes (node_id, last_seen, rssi, snr, version)
-                        VALUES (%s, NOW(), %s, %s, %s)
-                        ON DUPLICATE KEY UPDATE last_seen=NOW(), rssi=%s, snr=%s, version=%s
-                        """, (node_id, rssi, snr, nodeversion, rssi, snr, nodeversion))
-                    print("LoRa node info updated in database.")
-                except Exception as e:
-                    print(f"Failed to update LoRa node info: {e}")
+                    """, (node_id, rssi, snr, nodeversion, rssi, snr, nodeversion))
+                print("LoRa node info updated in database.")
+            except Exception as e:
+                print(f"Failed to update LoRa node info: {e}")
             return
 
         if msg.startswith('test'):

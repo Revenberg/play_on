@@ -205,7 +205,7 @@ std::map<std::string, std::string> parseFields(const std::string& input) {
 }
 
 void LoraNode::handleMessage(NodeMessage nodeMessage)
-{
+{    
     auto fields = parseFields(std::string(nodeMessage.parameters.c_str()));
     if (nodeMessage.object == "USER")
     {
@@ -239,12 +239,18 @@ void LoraNode::handlePacket(const String &packet)
     Serial.printf("[LoRa RX] Packet received: %s\n", packet.c_str());
     if (packet.startsWith("BEACON;"))
     {
-        String sender = packet.substring(7);
+        int start = packet.indexOf("nodeid: ") + 8;
+        int end = packet.indexOf(",", start);
+        String nodeid = packet.substring(start, end);
 
         // Metadata uitlezen
         float rssi = radio.getRSSI();
         float snr = radio.getSNR();
-        addOnlineNode(sender, rssi, snr);
+
+        String packet = "BEACON;nodeid: " + nodeid + ", rssi: " + String(rssi) + ", snr: " + String(snr) + ", version:" + RELEASE_ID;
+        Serial.println("[LoRa RX] " + packet);
+
+        addOnlineNode(nodeid, rssi, snr);
     }
     else if (packet.startsWith("MSG;"))
     {
@@ -269,14 +275,14 @@ void LoraNode::handlePacket(const String &packet)
 // =======================
 void LoraNode::sendBeacon()
 {
-    String packet = "BEACON;" + nodeName + ";" + String(radio.getRSSI()) + ";" + String(radio.getSNR()) + ";" + RELEASE_ID;
+    float rssi = radio.getRSSI();
+    float snr = radio.getSNR();
+    String packet = "BEACON;nodeid: " + nodeName + ", rssi: " + String(rssi) + ", snr: " + String(snr) + ", version:" + RELEASE_ID;
     int state = radio.transmit(packet);
 
     if (state == RADIOLIB_ERR_NONE)
     {
-        Serial.println("[LoRa TX] " + packet);
-        float rssi = radio.getRSSI();
-        float snr = radio.getSNR();
-        addOnlineNode("self: " + nodeName, rssi, snr);
+        Serial.println("[LoRa TX]" + packet);
+        addOnlineNode(nodeName, rssi, snr);
     }
 }
