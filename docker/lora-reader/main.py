@@ -41,7 +41,8 @@ def create_tables(conn):
             node_id VARCHAR(64) UNIQUE,
             last_seen DATETIME,
             rssi FLOAT,
-            snr FLOAT
+            snr FLOAT,
+            version VARCHAR(64)
         )
         """)
         cur.execute("""
@@ -76,10 +77,10 @@ def process_lora_message(msg, conn):
                 rssi, snr, rssi = 0, 0, 0  # Placeholder values
                 with conn.cursor() as cur:
                     cur.execute("""
-                    INSERT INTO lora_nodes (node_id, last_seen, rssi, snr)
-                    VALUES (%s, NOW(), %s, %s)
-                    ON DUPLICATE KEY UPDATE last_seen=NOW(), rssi=%s, snr=%s
-                        """, (node_id, rssi, snr, rssi, snr))
+                    INSERT INTO lora_nodes (node_id, last_seen, rssi, snr, version)
+                    VALUES (%s, NOW(), %s, %s, %s)
+                    ON DUPLICATE KEY UPDATE last_seen=NOW(), rssi=%s, snr=%s, version=%s
+                        """, (node_id, rssi, snr, nodeversion, rssi, snr, nodeversion))
                     print("LoRa node info updated in database.")
             return
 
@@ -98,10 +99,10 @@ def process_lora_message(msg, conn):
                 try:
                     with conn.cursor() as cur:
                         cur.execute("""
-                        INSERT INTO lora_nodes (node_id, last_seen, rssi, snr)
-                        VALUES (%s, NOW(), %s, %s)
-                        ON DUPLICATE KEY UPDATE last_seen=NOW(), rssi=%s, snr=%s
-                        """, (node_id, rssi, snr, rssi, snr))
+                        INSERT INTO lora_nodes (node_id, last_seen, rssi, snr, version)
+                        VALUES (%s, NOW(), %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE last_seen=NOW(), rssi=%s, snr=%s, version=%s
+                        """, (node_id, rssi, snr, nodeversion, rssi, snr, nodeversion))
                     print("LoRa node info updated in database.")
                 except Exception as e:
                     print(f"Failed to update LoRa node info: {e}")
