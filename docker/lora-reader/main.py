@@ -74,15 +74,13 @@ def process_lora_message(msg, conn):
     print(f"Received LoRa message: {msg}")
 
     if msg.startswith("[LoRa RX]") or msg.startswith("[LoRa TX]"):
-        if (msg.startswith("[LoRa RX]")) {
+        if (msg.startswith("[LoRa RX]")) :
             msg = msg[len("[LoRa RX]")].strip()
-        } else {
+        else:
             msg = msg[len("[LoRa TX]")].strip()
-            if (rpibeaconid == "") {
-                rpibeaconid = "rpi"
-            }
-        }
-
+            if (rpibeaconid == ""):
+                rpibeaconid = "rpi"           
+        
         print(f"Received LoRa message: {msg}")
 
         if msg.startswith('BEACON'):
