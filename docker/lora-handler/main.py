@@ -1,3 +1,4 @@
+from tokenize import String
 from attr import fields
 import pymysql
 import os
@@ -132,13 +133,12 @@ def process_lora_message(msg, conn):
             except Exception as e:
                 print(f"Failed to insert message: {e}")
 
-def loraSend(nodeMessage):
+def loraSend(ser, nodeMessage):
     # Send the LoRa message
     print(f"Sending LoRa message: {nodeMessage}")
-    msgID = String(millis())
-    msg = "MSG;" + msgID + ";RPI;" + 3 + ";" + nodeMessage
-
-
+    msgID = millis()
+    msg = "MSG;" + String(msgID) + ";RPI;" + 3 + ";" + nodeMessage
+    ser.write((msg + "\n").encode('utf-8'))
 
 def check_user_updates(ser, conn):
     while True:
@@ -157,8 +157,7 @@ def check_user_updates(ser, conn):
                 token = row['token']
                 team = row['team']
 
-                loraSend("USER;ADD; name:" + username + ",pwdHash:" + pwdHash + ",token:" + token + ",team:" + team);
-
+                loraSend(ser, "USER;ADD; name:" + username + ",pwdHash:" + pwdHash + ",token:" + token + ",team:" + team)
 
         time.sleep(60)  # Wait 60 seconds
 
