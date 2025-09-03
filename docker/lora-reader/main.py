@@ -70,6 +70,7 @@ def parse_fields(msg):
     return fields
 
 def process_lora_message(msg, conn):
+    global rpibeaconid
     # Parse message: node_id;user_id;team_id;object;function;parameters;timestamp
     print(f"Received LoRa message: {msg}")
 
