@@ -3,6 +3,7 @@
 #include <Wire.h>
 #include <WiFi.h>
 #include "LoraNode.h"
+#include "version.h"
 
 SSD1306Wire display(0x3c, SDA_OLED, SCL_OLED, GEOMETRY_128_64);
 OLEDDisplayUi ui(&display);
@@ -28,7 +29,12 @@ void frame3(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t 
     display->drawString(x, y, "nodes: " + String(LoraNode::getOnlineCount()) );
 }
 
-FrameCallback frames[3] = { frame1, frame2, frame3 };
+void frame4(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y) {
+    display->setFont(ArialMT_Plain_16);
+    display->drawString(x, y, "version: " + String(RELEASE_ID) );
+}
+
+FrameCallback frames[4] = { frame1, frame2, frame3, frame4 };
 
 void overlay(OLEDDisplay *display, OLEDDisplayUiState* state) {
     int bat = Node_battery_percent();
@@ -72,7 +78,7 @@ void Node_display_setup() {
 //    display.drawString(0, 16, "Battery: " + String(Node_battery_percent()) + "%");
 
     ui.setTargetFPS(30);
-    ui.setFrames(frames, 3);
+    ui.setFrames(frames, 4);
     ui.setOverlays(new OverlayCallback[1]{ overlay }, 1);
     ui.init();
 }
@@ -83,7 +89,7 @@ void Node_display_update() {
     // Iedere 30 seconden naar volgende frame
     unsigned long now = millis();
     if (now - lastFrameSwitch > frameSwitchInterval) {
-        currentFrame = (currentFrame + 1) % 3; // aantal frames
+        currentFrame = (currentFrame + 1) % 4; // aantal frames
         ui.switchToFrame(currentFrame);
         lastFrameSwitch = now;
     }
