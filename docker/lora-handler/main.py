@@ -88,20 +88,13 @@ def process_lora_message(msg, conn):
         print(f"Received LoRa message: {msg}")
 
         if msg.startswith('BEACON'):
-            print(f"BEACON")
             msg = msg[len('BEACON;'):].strip()
-
-            print(f"BEACON received: {msg}")
-
             fields = parse_fields(msg)
-            print(f"fields = {fields}")
-
+            
             node_id = fields['nodeid']
             rssi = fields['rssi']
             snr = fields['snr']
             nodeversion = fields['version']
-
-            print(f"BEACON received: node_id={node_id}, rssi={rssi}, snr={snr}, nodeversion={nodeversion}")
 
             if (rpibeaconid == "rpi"):
                 rpibeaconid = node_id
