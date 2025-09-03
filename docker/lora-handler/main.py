@@ -7,7 +7,6 @@ import serial
 import threading
 
 rpibeaconid = None
-last_user_update = None
 
 def get_db_connection(retries=10, delay=3):
     for attempt in range(retries):
@@ -141,10 +140,8 @@ def loraSend(ser, nodeMessage):
     ser.write((msg + "\n").encode('utf-8'))
 
 def check_user_updates(ser, conn):
+    last_user_update = 0
     while True:
-        if (last_user_update is None):
-            last_user_update = 0
-
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM users WHERE last_update > %s", (last_user_update,))
             rows = cur.fetchall()
@@ -158,6 +155,7 @@ def check_user_updates(ser, conn):
                 team = row['team']
 
                 loraSend(ser, "USER;ADD; name:" + username + ",pwdHash:" + pwdHash + ",token:" + token + ",team:" + team)
+                time.sleep(5)  # Wait 10 seconds
 
         time.sleep(60)  # Wait 60 seconds
 
