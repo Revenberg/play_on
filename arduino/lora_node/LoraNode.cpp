@@ -2,7 +2,6 @@
 #include "version.h"
 #include <map>
 #include <sstream>
-#include <SPI.h>
 #include <RadioLib.h>
 
 // =======================
@@ -247,14 +246,21 @@ void LoraNode::sendBeacon()
 // =======================
 void LoraNode::setup()
 {
+    Serial.begin(115200);
+    delay(200);
     Serial.println("[LoRa] Initializing SX1262...");
-    SPI.begin(9, 11, 10, 8);
+    Serial.println(RADIOLIB_VERSION);
 
-    pinMode(LORA_BUSY, INPUT);
-    Serial.print("BUSY pin state: ");
-    Serial.println(digitalRead(LORA_BUSY));
-
-    int state = radio.begin(868.0, 125.0, 9, 7, 0x34, 22, 8, 0);
+    int state = radio.begin(
+        868.0,   // frequentie MHz
+        125.0,   // bandwidth kHz
+        9,       // spreading factor
+        7,       // coding rate
+        0x12/*,    // sync word (zelfde op beide nodes!)
+        22,      // output power
+        8,       // preamble
+        0        // gain
+    */  );
 
     if (state != RADIOLIB_ERR_NONE)
     {
@@ -278,7 +284,7 @@ void LoraNode::loop()
 {
     // Check for incoming
     String str;
-    int state = radio.receive(str, 100);
+    int state = radio.receive(str);
 
     // Debug: print receive state always
     if (state == RADIOLIB_ERR_RX_TIMEOUT) {

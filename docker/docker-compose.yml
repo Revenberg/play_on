@@ -31,7 +31,7 @@ services:
       - ./lora-handler:/app
     restart: always
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB0
 
   webserver:
     build: ./webserver
