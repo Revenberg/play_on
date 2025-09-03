@@ -1,7 +1,7 @@
 from flask import Flask, render_template_string, request, redirect, url_for
 import pymysql
 import os
-from werkzeug.security import generate_password_hash
+import hashlib
 
 app = Flask(__name__)
 
@@ -16,6 +16,10 @@ def get_db_connection():
 
 import secrets
 
+def sha256(password):
+    hash_hex = hashlib.sha256(password.encode()).hexdigest()
+    return hash_hex
+
 def generate_token(length=32):
     """
     Generates a secure random token for user authentication.
@@ -23,9 +27,6 @@ def generate_token(length=32):
     :return: Hexadecimal token string.
     """
     return secrets.token_hex(length // 2)
-
-def hashPassword(password):
-    return generate_password_hash(password)
 
 @app.route('/')
 def index():
@@ -51,7 +52,7 @@ def users():
                 username = request.form.get('username')
                 team_id = request.form.get('team_id')
                 token = generate_token()
-                password_hash = hashPassword(request.form.get('password'))
+                password_hash = sha256(request.form.get('password'))
 
                 if username and team_id and token and password_hash:
                         try:

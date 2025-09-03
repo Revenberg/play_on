@@ -29,7 +29,7 @@ def create_tables(conn):
             username VARCHAR(64) UNIQUE,
             team_id INT,
             token VARCHAR(128),
-            password_hash VARCHAR(128),
+            password_hash VARCHAR(225),
             last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )
         """)

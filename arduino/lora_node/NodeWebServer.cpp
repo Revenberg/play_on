@@ -6,6 +6,7 @@
 #include "NodeWebServer.h"
 #include "version.h"
 #include "LoraNode.h"
+#include "mbedtls/md.h"
 
 // ====== Config ======
 #define DNS_PORT 53
@@ -29,6 +30,27 @@ AsyncWebServer NodeWebServer::httpServer(80);
 DNSServer NodeWebServer::dnsServer;
 
 // ====== Helpers ======
+String sha256(String input) {
+  byte hash[32];
+  mbedtls_md_context_t ctx;
+  mbedtls_md_type_t md_type = MBEDTLS_MD_SHA256;
+
+  mbedtls_md_init(&ctx);
+  mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(md_type), 0);
+  mbedtls_md_starts(&ctx);
+  mbedtls_md_update(&ctx, (const unsigned char *)input.c_str(), input.length());
+  mbedtls_md_finish(&ctx, hash);
+  mbedtls_md_free(&ctx);
+
+  String output = "";
+  for (int i = 0; i < 32; i++) {
+    char str[3];
+    sprintf(str, "%02x", (int)hash[i]);
+    output += str;
+  }
+  return output;
+}
+
 String escapeHtml(const String &input)
 {
     String out = input;
@@ -226,7 +248,8 @@ void NodeWebServer::setupLogin()
         if (request->hasArg("user")) user = request->arg("user");
         if (request->hasArg("pass")) pass = request->arg("pass");
 
-        if (User::isValidLogin(user, pass)) {
+        String pwdHash = sha256(pass);
+        if (User::isValidLogin(user, pwdHash)) {
             String session = User::createSession(user);
             AsyncWebServerResponse *response = request->beginResponse(303);
             response->addHeader("Set-Cookie", "session=" + session + "; Path=/; Max-Age=86400");
@@ -254,7 +277,8 @@ void NodeWebServer::setupRegister()
         if (request->hasArg("pass")) pass = request->arg("pass");
         if (request->hasArg("team")) team = request->arg("team");
 
-        if (User::registerUser(user, pass, team)) {
+        String pwdHash = sha256(pass);
+        if (User::registerUser(user, pwdHash, team)) {
             String session = User::createSession(user);
             AsyncWebServerResponse *response = request->beginResponse(303);
             response->addHeader("Set-Cookie", "session=" + session + "; Path=/; Max-Age=86400");
